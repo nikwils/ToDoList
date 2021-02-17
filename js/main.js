@@ -7,21 +7,23 @@ const todoControl = document.querySelector('.todo-control'),
     btnAdd = document.querySelector('.header-button'),
     todoCompleted = document.querySelector('.todo-completed');
 
-let todoData =[
+let todoData =[];
 
-];
+let arrStorage = JSON.parse(localStorage.getItem("myKey"));
+console.log(arrStorage);
 
+if(localStorage.getItem("myKey")){
+    todoData = arrStorage;
+} else {
+    todoData = [];
+}
 
 
 const render = function() {
+    localStorage.setItem("myKey", JSON.stringify(todoData));
     todoList.textContent = '';
     todoCompleted.textContent = '';
 
-    if(localStorage.getItem("myKey")){
-        todoData = JSON.parse(localStorage.getItem("myKey"));
-    } else {
-        [];
-    }
     
     todoData.forEach(function(item){
         const li = document.createElement('li');
@@ -45,16 +47,33 @@ const render = function() {
             item.completed = !item.completed;
             render();
         });
-        const btnTodeRemove = li.querySelector('.todo-remove');
 
-        btnTodeRemove.addEventListener('click', function(){
-            btnTodeRemove.parentNode.parentNode.remove();
-            localStorage.removeItem("myKey");
+        const btnTodoRemove = li.querySelector('.todo-remove');
+
+        btnTodoRemove.addEventListener('click', function(){
+            btnTodoRemove.parentNode.parentNode.remove();
+            console.log(todoData.splice(todoData.indexOf(item),1));
+
+                
+                function array_compare(a, b){
+                
+                    for(let i = 0; i < b.length; i++)
+                       if(a[i] != b[i]){
+                          delete b[i];
+                        }
+                        render();
+                }
+                array_compare(todoData, arrStorage);
+
+            console.log(todoData);
+            render();
         });
-        
-    });
 
+    });
+    
 };
+
+
 
 todoControl.addEventListener('submit', function(event){
 
@@ -72,11 +91,14 @@ todoControl.addEventListener('submit', function(event){
         todoData.push(NewToDo);
         headerInput.value = '';
     }
-    
+
     localStorage.setItem("myKey", JSON.stringify(todoData));
 
     render();
 
 });
+
+
+
 
 render();
